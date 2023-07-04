@@ -45,20 +45,6 @@ def distancia_euclideana(mat1, mat2):
     return np.sqrt(np.sum((mat1 - mat2) ** 2))
 
 
-def closest_euc(img_to_predict, data_used, neighbors=3):  # ta mal
-    distancias = []
-
-    for i in data_used:
-        dist = distancia_euclideana(img_to_predict, i)
-        distancias.append(dist)
-
-    # también se puede realizar con argsort
-    distancias.sort(reverse=True)
-    closest = distancias[:neighbors]
-
-    return closest  # returns a list
-
-
 def knn_method1(img_to_predict):  # method using original dataset
 
     preprocessed = pre_processing(img_to_predict)
