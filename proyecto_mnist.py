@@ -1,11 +1,11 @@
 import pyxel
 import cv2
 import numpy as np
+import knn_related as my_knn
 
-# tamaño del espacio donde SÍ se puede dibujar
+
 alto = 100
 ancho = 100
-
 
 prediction = 0
 drawing = False
@@ -13,56 +13,6 @@ last_drawn_x = 0  # posición anterior del mouse
 last_drawn_y = 0  # posición anterior del mouse
 dibujo_matrix = np.zeros((alto, ancho))
 
-# digitos = datasets.load_digits()
-# data = digitos.images.reshape((len(digitos.images), -1))
-#
-# xtrain, ytrain, xtest, ytest = data[:1500], digitos.target[:1500], data[1500:], digitos.target[1500:]
-#
-# train_d = np.insert(xtrain, 64, ytrain, axis=1)
-
-
-#--------------------------------
-
-
-## intento del proyecto no le hagan caso pls
-
-# def distancia_euc(f1, f2):
-#     dist = 0
-#     for i in range(len(f1) - 1):
-#         dist += (f1[i] - f2[i]) ** 2
-#
-#     return np.sqrt(dist)
-#
-#
-# def knn(training_data, test, n):
-#     distancias_euc = []
-#     datos = []
-#
-#     for i in training_data:
-#         d = distancia_euc(test, i)
-#         distancias_euc.append(d)
-#         datos.append(i)
-#
-#     datos = np.array(datos)
-#     id = distancias_euc.argsort()
-#     datos = datos[id]
-#
-#     vecinos = datos[:n]
-#
-#     return vecinos
-#
-#
-# def predict_knn(training_data, test, n):
-#     vecinos = knn(training_data, test, n)
-#     classes = []
-#     for i in vecinos:
-#         classes.append(i[-1])
-#     prediction = max(set(classes), key=classes.count)
-#
-#     return prediction
-#
-
-#--------------------------------
 
 def drawing_in_matrix():  # dibuja en la matriz, información pura
     global last_drawn_x, last_drawn_y
@@ -91,11 +41,10 @@ def erase_drawing():
 
 
 def predict_knn_pix():
-    global prediction
-
-    # algoritmo knn pepepepepe
-
-    print(prediction)
+    global dibujo_matrix
+    img = dibujo_matrix
+    print("Predicción 1:", my_knn.knn_method1(img))
+    print("Predicción 2:", my_knn.knn_method2(img))
 
 
 def drawing_in_window():  # toma el dibujo de la matriz y lo representa en la ventana
@@ -116,6 +65,7 @@ def inter_apearance():
     pyxel.text(105, 40, "To predict use P ", 0)
     pyxel.text(105, 50, "To quit use Q ", 0)
     pyxel.text(105, 60, "Prediction: " + str(prediction), 0)
+
 
 class App:
     def __init__(self):
