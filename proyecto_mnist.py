@@ -17,7 +17,7 @@ dibujo_matrix = np.zeros((alto, ancho))
 def drawing_in_matrix():  # dibuja en la matriz, información pura
     global last_drawn_x, last_drawn_y
 
-    cv2.line(dibujo_matrix, (last_drawn_x, last_drawn_y), (pyxel.mouse_x, pyxel.mouse_y), 255, 5)
+    cv2.line(dibujo_matrix, (last_drawn_x, last_drawn_y), (pyxel.mouse_x, pyxel.mouse_y), 255, 13)
 
     last_drawn_x = pyxel.mouse_x
     last_drawn_y = pyxel.mouse_y
@@ -42,9 +42,9 @@ def erase_drawing():
 
 def predict_knn_pix():
     global dibujo_matrix
-    img = dibujo_matrix
-    print("Predicción 1:", my_knn.knn_method1(img))
-    print("Predicción 2:", my_knn.knn_method2(img))
+
+    print("Predicción 1:", my_knn.knn_method1(dibujo_matrix))
+    print("Predicción 2:", my_knn.knn_method2(dibujo_matrix))
 
 
 def drawing_in_window():  # toma el dibujo de la matriz y lo representa en la ventana
