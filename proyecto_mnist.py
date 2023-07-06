@@ -41,8 +41,6 @@ def erase_drawing():
 
 
 def predict_knn_pix():
-    global dibujo_matrix
-
     print("Predicción 1:", my_knn.knn_method1(dibujo_matrix))
     print("Predicción 2:", my_knn.knn_method2(dibujo_matrix))
 
@@ -57,14 +55,12 @@ def drawing_in_window():  # toma el dibujo de la matriz y lo representa en la ve
 
 
 def inter_apearance():
-    global prediction
     pyxel.rect(100, 0, 200, 100, 7)
     pyxel.text(105, 10, "Digit input: ", 0)
     pyxel.text(105, 20, "To draw use LEFT CLICK ", 0)
     pyxel.text(105, 30, "To clear use SPACE ", 0)
     pyxel.text(105, 40, "To predict use P ", 0)
     pyxel.text(105, 50, "To quit use Q ", 0)
-    pyxel.text(105, 60, "Prediction: " + str(prediction), 0)
 
 
 class App:
