@@ -1,7 +1,7 @@
 import cv2
 import numpy as np
 from sklearn import datasets
-import matplotlib.pyplot as plt
+
 
 digitos = datasets.load_digits()
 data = digitos.data

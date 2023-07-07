@@ -9,9 +9,18 @@ ancho = 100
 
 prediction = 0
 drawing = False
+menu = True
+app1_draw = False
+app2_image = False
+app2_image_csvmode = False
+app2_image_submode = False
 last_drawn_x = 0  # posición anterior del mouse
 last_drawn_y = 0  # posición anterior del mouse
+
+
 dibujo_matrix = np.zeros((alto, ancho))
+image_submited = cv2.imread("image.png", cv2.IMREAD_GRAYSCALE)
+csv_submited = np.loadtxt("csv_img.csv", delimiter=",")
 
 
 def drawing_in_matrix():  # dibuja en la matriz, información pura
@@ -44,6 +53,13 @@ def predict_knn_pix():
     print("Predicción 1:", my_knn.knn_method1(dibujo_matrix))
     print("Predicción 2:", my_knn.knn_method2(dibujo_matrix))
 
+def predict_knn_img():
+    print("Predicción 1:", my_knn.knn_method1(image_submited))
+    print("Predicción 2:", my_knn.knn_method2(image_submited))
+
+def predict_knn_csv():
+    print("Predicción 1:", my_knn.knn_method1(csv_submited))
+    print("Predicción 2:", my_knn.knn_method2(csv_submited))
 
 def drawing_in_window():  # toma el dibujo de la matriz y lo representa en la ventana
     for y in range(ancho):
@@ -53,14 +69,31 @@ def drawing_in_window():  # toma el dibujo de la matriz y lo representa en la ve
             else:
                 pyxel.pset(x, y, 0)
 
+def ui_menu():
+    pyxel.text(5, 10, "Select type of input: ", 7)
+    pyxel.text(5, 20, "1. Live ", 7)
+    pyxel.text(5, 30, "2. Submitted ", 7)
 
-def inter_apearance():
+def ui_draw():
     pyxel.rect(100, 0, 200, 100, 7)
     pyxel.text(105, 10, "Digit input: ", 0)
     pyxel.text(105, 20, "To draw use LEFT CLICK ", 0)
     pyxel.text(105, 30, "To clear use SPACE ", 0)
     pyxel.text(105, 40, "To predict use P ", 0)
-    pyxel.text(105, 50, "To quit use Q ", 0)
+    pyxel.text(105, 50, "To go to MENU use M", 0)
+
+
+def ui_submit():
+    pyxel.text(5, 10, "Type of submsn: ", 7)
+    pyxel.text(5, 20, "1. Image ", 7)
+    pyxel.text(5, 30, "2. CSV ", 7)
+    pyxel.text(5, 40, "To predict use P ", 7)
+    pyxel.text(5, 50, "To go to MENU use M", 7)
+    pyxel.text(5, 60, "* submit b4 running", 7)
+    if app2_image_submode:
+        pyxel.text(5, 70, "Mode: PNG", 8)
+    if app2_image_csvmode:
+        pyxel.text(5, 70, "Mode: CSV", 8)
 
 
 class App:
@@ -70,32 +103,70 @@ class App:
         pyxel.run(self.update, self.draw)
 
     def update(self):
-        global drawing
+        global drawing, menu, app1_draw, app2_image
 
-        if pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT):  # si se presiona el boton izquierdo del mouse
-
-            drawing_state_start()  # se inicia el dibujo
-
-        if pyxel.btnr(pyxel.MOUSE_BUTTON_LEFT):  # si se suelta el boton izquierdo del mouse
-            drawing_state_stop()  # se detiene el dibujo
-
-        if drawing:  # si se esta dibujando
-            drawing_in_matrix()  # se dibuja en la matriz
+        if pyxel.btnp(pyxel.KEY_M):
+            menu = True
+            app1_draw = False
+            app2_image = False
 
         if pyxel.btnp(pyxel.KEY_Q):  # si se presiona la tecla Q
             pyxel.quit()  # se cierra el programa
 
-        if pyxel.btnp(pyxel.KEY_SPACE):  # si se presiona la tecla SPACE
-            erase_drawing()  # se borra el dibujo
+        if menu:
+            if pyxel.btnp(pyxel.KEY_1):
+                menu = False
+                app1_draw = True
 
-        if pyxel.btnp(pyxel.KEY_P):  # si se presiona la tecla P
-            predict_knn_pix()  # se predice el numero
+            if pyxel.btnp(pyxel.KEY_2):
+                menu = False
+                app2_image = True
+
+        if app1_draw:
+            if pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT):  # si se presiona el boton izquierdo del mouse
+
+                drawing_state_start()  # se inicia el dibujo
+
+            if pyxel.btnr(pyxel.MOUSE_BUTTON_LEFT):  # si se suelta el boton izquierdo del mouse
+                drawing_state_stop()  # se detiene el dibujo
+
+            if drawing:  # si se esta dibujando
+                drawing_in_matrix()  # se dibuja en la matriz
+
+            if pyxel.btnp(pyxel.KEY_SPACE):  # si se presiona la tecla SPACE
+                erase_drawing()  # se borra el dibujo
+
+            if pyxel.btnp(pyxel.KEY_P):  # si se presiona la tecla P
+                predict_knn_pix()  # se predice el numero
+
+        if app2_image:
+            global app2_image_submode, app2_image_csvmode
+
+            if pyxel.btnp(pyxel.KEY_1):
+                app2_image_submode = True
+                app2_image_csvmode = False
+            if pyxel.btnp(pyxel.KEY_2):
+                app2_image_csvmode = True
+                app2_image_submode = False
+            if pyxel.btnp(pyxel.KEY_P):
+                if app2_image_submode:
+                    predict_knn_img()
+                if app2_image_csvmode:
+                    predict_knn_csv()
+                    print(csv_submited)
+
+
 
     def draw(self):
         pyxel.cls(0)
+        if menu:
+            ui_menu()
+        if app1_draw:
+            ui_draw()
+            drawing_in_window()  # se dibuja en la ventana
 
-        drawing_in_window()  # se dibuja en la ventana
-        inter_apearance()
+        if app2_image:
+            ui_submit()
 
 
 #  ------------------------------
