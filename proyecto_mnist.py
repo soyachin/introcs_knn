@@ -23,12 +23,13 @@ csv_submited = np.loadtxt("csv_img.csv", delimiter=",")
 
 
 def importFile(type):
-    global  csv_submited, image_submited
+    global csv_submited, image_submited
     fileTitle = input("Por favor indique el archivo que desea importar: ")
     if type == "CSV":
         csv_submited = np.loadtxt(fileTitle, delimiter=",")
     elif type == "IMG":
-       image_submited = cv2.imread(fileTitle, cv2.IMREAD_GRAYSCALE)
+        image_submited = cv2.imread(fileTitle, cv2.IMREAD_GRAYSCALE)
+
 
 def drawing_in_matrix():  # dibuja en la matriz, información pura
     global last_drawn_x, last_drawn_y
@@ -55,6 +56,7 @@ def erase_drawing():
     global dibujo_matrix
     dibujo_matrix = np.zeros((alto, ancho))
 
+
 def predict_knn(matrix, isDark):
     if matrix is None:
         print("No has importado ningun archivo, por favor importa un archivo")
@@ -64,6 +66,7 @@ def predict_knn(matrix, isDark):
     print("Predicción 1:", my_knn.knn_method1(preprocessed))
     print("Predicción 2:", my_knn.knn_method2(preprocessed))
 
+
 def drawing_in_window():  # toma el dibujo de la matriz y lo representa en la ventana
     for y in range(ancho):
         for x in range(alto):
@@ -72,10 +75,12 @@ def drawing_in_window():  # toma el dibujo de la matriz y lo representa en la ve
             else:
                 pyxel.pset(x, y, 0)
 
+
 def ui_menu():
     pyxel.text(5, 10, "Select type of input: ", 7)
     pyxel.text(5, 20, "1. Live ", 7)
     pyxel.text(5, 30, "2. Submitted ", 7)
+
 
 def ui_draw():
     pyxel.rect(100, 0, 200, 100, 7)
@@ -161,8 +166,6 @@ class App:
                     predict_knn(image_submited, isDark)
                 if app2_image_csvmode:
                     predict_knn(csv_submited, isDark)
-
-
 
     def draw(self):
         pyxel.cls(0)

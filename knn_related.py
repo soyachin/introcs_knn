@@ -1,7 +1,7 @@
 import cv2
 import numpy as np
 from sklearn import datasets
-
+import matplotlib.pyplot as plt
 
 digitos = datasets.load_digits()
 data = digitos.data
@@ -9,19 +9,23 @@ target = digitos.target
 images = digitos.images
 
 
-# promedio del dataset
-
+# 1. Generar una matriz con los promedios de cada dígito
 mean_digits = np.zeros((10, 8, 8))
 
 for i in range(10):
     mean_digits[i] = np.mean(images[target == i], axis=0)
 
+# 2. Mostrar las matrices de los promedios de cada dígito. matplotlib
 
+for i in range(10):
+    plt.subplot(2, 5, i + 1)
+    plt.imshow(mean_digits[i], cmap='gray_r')
+    plt.title("Digito " + str(i))
+    plt.axis('off')
+
+plt.show()
 def pre_processing(mat, isDark=False):  # función que recibe una imagen y establece que el max valor sea 16 y minimo 0
 
-    # contours, hierarchy = cv2.findContours(mat, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
-    # x, y, w, h = cv2.boundingRect(contours)
-    #
     newMat = cv2.resize(mat, (8, 8))
 
     if(not isDark):
