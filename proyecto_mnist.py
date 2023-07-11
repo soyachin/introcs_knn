@@ -1,23 +1,30 @@
 import pyxel
 import cv2
 import numpy as np
-import knn_related as my_knn
+import knn_related as my_knn  # importa el archivo knn_related.py
+from statistics import mode
 
+# Se define el tamaño del canvas (app_live_drawing)
 alto = 100
 ancho = 100
 
-prediction = 0
-drawing = False
-menu = True
-app1_draw = False
-app2_image = False
-app2_image_csvmode = False
-app2_image_submode = False
+# Se declaran variables para el funcionamiento del programa (estados y posición del mouse)
+drawing_state = False  # ¿Se está dibujando?
+
+main_menu = True  # ¿Se está en el menú principal?
+app_live_drawing = False
+app_submit = False
+app_submit_CSVMODE = False
+app_submit_PNGMODE = False
+
 last_drawn_x = 0  # posición anterior del mouse
 last_drawn_y = 0  # posición anterior del mouse
 isDark = False
 
+# Se crea una matriz que almacena el dibujo
 dibujo_matrix = np.zeros((alto, ancho))
+
+# Se lee la información de los archivos csv e imágenes
 image_submited = cv2.imread("image.jpg", cv2.IMREAD_GRAYSCALE)
 csv_submited = np.loadtxt("csv_img.csv", delimiter=",")
 
@@ -31,25 +38,28 @@ def importFile(type):
         image_submited = cv2.imread(fileTitle, cv2.IMREAD_GRAYSCALE)
 
 
-def drawing_in_matrix():  # dibuja en la matriz, información pura
+def drawing_in_matrix():  # Se altera la información de la matriz que almacena el dibujo
     global last_drawn_x, last_drawn_y
 
+    # Se dibuja una linea entre la posición anterior del mouse y la posición actual, color y grosor
     cv2.line(dibujo_matrix, (last_drawn_x, last_drawn_y), (pyxel.mouse_x, pyxel.mouse_y), 255, 13)
+    # Recordar que el dibujo es fluido porque se actualiza constantemente
 
+    # Se actualiza la posición anterior del mouse
     last_drawn_x = pyxel.mouse_x
     last_drawn_y = pyxel.mouse_y
 
 
 def drawing_state_start():
-    global drawing, last_drawn_x, last_drawn_y
-    drawing = True
+    global drawing_state, last_drawn_x, last_drawn_y
+    drawing_state = True
     last_drawn_x = pyxel.mouse_x
     last_drawn_y = pyxel.mouse_y
 
 
 def drawing_state_stop():
-    global drawing
-    drawing = False
+    global drawing_state
+    drawing_state = False
 
 
 def erase_drawing():
@@ -63,11 +73,21 @@ def predict_knn(matrix, isDark):
         return
 
     preprocessed = my_knn.pre_processing(matrix, isDark)
-    print("Predicción 1:", my_knn.knn_method1(preprocessed))
-    print("Predicción 2:", my_knn.knn_method2(preprocessed))
+
+    method1_result = my_knn.knn_method1(preprocessed)
+    method2_result = my_knn.knn_method2(preprocessed)
+
+    print("\nTargets:")
+    print("Metodo 1:", method1_result)
+    print("Metodo 2:", method2_result, "\n")
+
+    print("Soy la inteliencia artificial, y he detectado que el digito ingresado corresponde al número:",
+          mode(method1_result))
+    print("Soy la inteliencia artificial versión 2, y he detectado que el digito ingresado corresponde al número:",
+          mode(method2_result))
 
 
-def drawing_in_window():  # toma el dibujo de la matriz y lo representa en la ventana
+def show_drawing_pyxel():  # toma el dibujo de la matriz y lo representa en la ventana
     for y in range(ancho):
         for x in range(alto):
             if dibujo_matrix[y][x] == 255:
@@ -99,40 +119,42 @@ def ui_submit():
     pyxel.text(5, 50, "To predict use P ", 7)
     pyxel.text(5, 60, "To go to MENU use M", 7)
     pyxel.text(5, 70, "* submit b4 running", 7)
-    if app2_image_submode:
+    if app_submit_PNGMODE:
         pyxel.text(5, 80, "Mode: PNG", 8)
-    if app2_image_csvmode:
+    if app_submit_CSVMODE:
         pyxel.text(5, 80, "Mode: CSV", 8)
     pyxel.text(5, 90, "Dark: " + str(isDark), 9)
 
 
 class App:
-    def __init__(self):
-        pyxel.init(alto + 100, ancho, title="digit input :3")
+    # Las funciones __init__, update y draw son funciones que deben ser definidas. Leer la documentación de Pyxel
+    def __init__(self):  # Se inicializa la ventana
+        pyxel.init(alto + 100, ancho, title="Proyecto final")
         pyxel.mouse(True)  # activa el mouse
         pyxel.run(self.update, self.draw)
 
+    # La función update() es la encargada de actualizar la lógica del programa, basándose en el uso de teclas (inputs) del usuario
     def update(self):
-        global drawing, menu, app1_draw, app2_image
+        global drawing_state, main_menu, app_live_drawing, app_submit
 
         if pyxel.btnp(pyxel.KEY_M):
-            menu = True
-            app1_draw = False
-            app2_image = False
+            main_menu = True
+            app_live_drawing = False
+            app_submit = False
 
         if pyxel.btnp(pyxel.KEY_Q):  # si se presiona la tecla Q
             pyxel.quit()  # se cierra el programa
 
-        if menu:
+        if main_menu:
             if pyxel.btnp(pyxel.KEY_1):
-                menu = False
-                app1_draw = True
+                main_menu = False
+                app_live_drawing = True
 
             if pyxel.btnp(pyxel.KEY_2):
-                menu = False
-                app2_image = True
+                main_menu = False
+                app_submit = True
 
-        if app1_draw:
+        if app_live_drawing:
             if pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT):  # si se presiona el boton izquierdo del mouse
 
                 drawing_state_start()  # se inicia el dibujo
@@ -140,7 +162,7 @@ class App:
             if pyxel.btnr(pyxel.MOUSE_BUTTON_LEFT):  # si se suelta el boton izquierdo del mouse
                 drawing_state_stop()  # se detiene el dibujo
 
-            if drawing:  # si se esta dibujando
+            if drawing_state:  # si se esta dibujando
                 drawing_in_matrix()  # se dibuja en la matriz
 
             if pyxel.btnp(pyxel.KEY_SPACE):  # si se presiona la tecla SPACE
@@ -149,33 +171,35 @@ class App:
             if pyxel.btnp(pyxel.KEY_P):  # si se presiona la tecla P
                 predict_knn(dibujo_matrix, True)  # se predice el numero
 
-        if app2_image:
-            global app2_image_submode, app2_image_csvmode, isDark
+        if app_submit:
+            global app_submit_PNGMODE, app_submit_CSVMODE, isDark
             if pyxel.btnp(pyxel.KEY_I):
-                app2_image_submode = True
-                app2_image_csvmode = False
+                app_submit_PNGMODE = True
+                app_submit_CSVMODE = False
                 importFile("IMAGE")
             if pyxel.btnp(pyxel.KEY_F):
-                app2_image_csvmode = True
-                app2_image_submode = False
+                app_submit_CSVMODE = True
+                app_submit_PNGMODE = False
                 importFile("CSV")
             if pyxel.btnp(pyxel.KEY_C):
                 isDark = not isDark
             if pyxel.btnp(pyxel.KEY_P):
-                if app2_image_submode:
+                if app_submit_PNGMODE:
                     predict_knn(image_submited, isDark)
-                if app2_image_csvmode:
+                if app_submit_CSVMODE:
                     predict_knn(csv_submited, isDark)
 
+    # La función draw() es la encargada de dibujar (mostrar) en la ventana
     def draw(self):
         pyxel.cls(0)
-        if menu:
-            ui_menu()
-        if app1_draw:
+        if main_menu:
+            ui_menu()  # Se definen funciones para dibujar en la ventana para cada caso específico
+        if app_live_drawing:
             ui_draw()
-            drawing_in_window()  # se dibuja en la ventana
+            show_drawing_pyxel()  # Con esta función se toma la matriz de dibujo y se muestra en la ventana de pyxel.
+            # Si no se implementa esta función, no se verá el dibujo en la ventana (pero sí se guardará en la matriz)
 
-        if app2_image:
+        if app_submit:
             ui_submit()
 
 
