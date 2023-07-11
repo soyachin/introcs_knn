@@ -1,7 +1,6 @@
 import cv2
 import numpy as np
 from sklearn import datasets
-import matplotlib.pyplot as plt
 
 digitos = datasets.load_digits()
 data = digitos.data
@@ -12,6 +11,10 @@ images = digitos.images
 # Se decide generarlas todas de una vez para no tener que volver a calcularlas
 # cada vez que se quiera mostrar una imagen promedio
 
+# Se saca el mean de todas las imagenes que corresponden al digito i
+# Por ejemplo, si i = 0, se saca el mean de todas las imagenes que corresponden al digito 0
+# Esto se logra utilizando imagenes[target == i]
+
 mean_digits = np.zeros((10, 8, 8))
 
 for i in range(10):
@@ -21,10 +24,11 @@ for i in range(10):
 # 2. Generación de image --> go to generate_image.py
 # Funciones auxiliares que se utilizarán en el programa principal
 
-def pre_processing(mat, isDark=False):  # función que recibe una imagen y establece que el max valor sea 16 y minimo 0
+def pre_processing(mat, isDark=False):  # isDark = True si el fondo es oscuro
 
     newMat = cv2.resize(mat, (8, 8))
 
+    # Se invierte la imagen si el fondo es oscuro
     if not isDark:
         i = 0
         while i < 8:
@@ -36,6 +40,7 @@ def pre_processing(mat, isDark=False):  # función que recibe una imagen y estab
 
     i = 0
 
+    # Se normaliza la imagen
     while i < 8:
         j = 0
         while j < 8:

@@ -9,6 +9,7 @@ alto = 100
 ancho = 100
 
 # Se declaran variables para el funcionamiento del programa (estados y posición del mouse)
+
 drawing_state = False  # ¿Se está dibujando?
 
 main_menu = True  # ¿Se está en el menú principal?
@@ -29,7 +30,7 @@ image_submited = cv2.imread("image.jpg", cv2.IMREAD_GRAYSCALE)
 csv_submited = np.loadtxt("csv_img.csv", delimiter=",")
 
 
-def importFile(type):
+def importFile(type):  # Se pasa un string que indica el tipo de archivo que se quiere importar
     global csv_submited, image_submited
     fileTitle = input("Por favor indique el archivo que desea importar: ")
     if type == "CSV":
@@ -133,7 +134,8 @@ class App:
         pyxel.mouse(True)  # activa el mouse
         pyxel.run(self.update, self.draw)
 
-    # La función update() es la encargada de actualizar la lógica del programa, basándose en el uso de teclas (inputs) del usuario
+    # La función update() es la encargada de actualizar la lógica del programa,
+    # basándose en el uso de teclas (inputs) del usuario
     def update(self):
         global drawing_state, main_menu, app_live_drawing, app_submit
 
@@ -155,6 +157,10 @@ class App:
                 app_submit = True
 
         if app_live_drawing:
+            # Diccionario: revisar documentación de Pyxel
+            # .btnp = Button Pressed
+            # .btnr = Button Released
+            # .KEY_SPACE = Tecla espacio y así ...
             if pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT):  # si se presiona el boton izquierdo del mouse
 
                 drawing_state_start()  # se inicia el dibujo
@@ -169,7 +175,7 @@ class App:
                 erase_drawing()  # se borra el dibujo
 
             if pyxel.btnp(pyxel.KEY_P):  # si se presiona la tecla P
-                predict_knn(dibujo_matrix, True)  # se predice el numero
+                predict_knn(dibujo_matrix, True)  # se predice el numero, el True es porque se debe invertir el color
 
         if app_submit:
             global app_submit_PNGMODE, app_submit_CSVMODE, isDark
