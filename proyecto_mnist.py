@@ -57,12 +57,12 @@ def erase_drawing():
     dibujo_matrix = np.zeros((alto, ancho))
 
 
-def predict_knn(matrix, isDark):
+def predict_knn(matrix, isDark, isFormatted=False):
     if matrix is None:
         print("No has importado ningun archivo, por favor importa un archivo")
         return
 
-    preprocessed = my_knn.pre_processing(matrix, isDark)
+    preprocessed = my_knn.pre_processing(matrix, isDark, isFormatted)
     print("Predicción 1:", my_knn.knn_method1(preprocessed))
     print("Predicción 2:", my_knn.knn_method2(preprocessed))
 
@@ -165,7 +165,7 @@ class App:
                 if app2_image_submode:
                     predict_knn(image_submited, isDark)
                 if app2_image_csvmode:
-                    predict_knn(csv_submited, isDark)
+                    predict_knn(csv_submited, isDark, True)
 
     def draw(self):
         pyxel.cls(0)

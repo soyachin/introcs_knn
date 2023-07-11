@@ -24,7 +24,7 @@ for i in range(10):
     plt.axis('off')
 
 plt.show()
-def pre_processing(mat, isDark=False):  # función que recibe una imagen y establece que el max valor sea 16 y minimo 0
+def pre_processing(mat, isDark=False, isFormatted=False):  # función que recibe una imagen y establece que el max valor sea 16 y minimo 0
 
     newMat = cv2.resize(mat, (8, 8))
 
@@ -42,7 +42,7 @@ def pre_processing(mat, isDark=False):  # función que recibe una imagen y estab
     while i < 8:
         j = 0
         while j < 8:
-            if(newMat[i][j]>16):
+            if(not isFormatted):
                 newMat[i][j] = newMat[i][j] * 16 // 255
             j = j + 1
         i = i + 1
