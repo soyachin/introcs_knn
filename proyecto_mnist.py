@@ -3,7 +3,6 @@ import cv2
 import numpy as np
 import knn_related as my_knn
 
-
 alto = 100
 ancho = 100
 
@@ -16,12 +15,20 @@ app2_image_csvmode = False
 app2_image_submode = False
 last_drawn_x = 0  # posición anterior del mouse
 last_drawn_y = 0  # posición anterior del mouse
-
+isDark = False
 
 dibujo_matrix = np.zeros((alto, ancho))
-image_submited = cv2.imread("image.png", cv2.IMREAD_GRAYSCALE)
+image_submited = cv2.imread("image.jpg", cv2.IMREAD_GRAYSCALE)
 csv_submited = np.loadtxt("csv_img.csv", delimiter=",")
 
+
+def importFile(type):
+    global  csv_submited, image_submited
+    fileTitle = input("Por favor indique el archivo que desea importar: ")
+    if type == "CSV":
+        csv_submited = np.loadtxt(fileTitle, delimiter=",")
+    elif type == "IMG":
+       image_submited = cv2.imread(fileTitle, cv2.IMREAD_GRAYSCALE)
 
 def drawing_in_matrix():  # dibuja en la matriz, información pura
     global last_drawn_x, last_drawn_y
@@ -48,18 +55,14 @@ def erase_drawing():
     global dibujo_matrix
     dibujo_matrix = np.zeros((alto, ancho))
 
+def predict_knn(matrix, isDark):
+    if matrix is None:
+        print("No has importado ningun archivo, por favor importa un archivo")
+        return
 
-def predict_knn_pix():
-    print("Predicción 1:", my_knn.knn_method1(dibujo_matrix))
-    print("Predicción 2:", my_knn.knn_method2(dibujo_matrix))
-
-def predict_knn_img():
-    print("Predicción 1:", my_knn.knn_method1(image_submited))
-    print("Predicción 2:", my_knn.knn_method2(image_submited))
-
-def predict_knn_csv():
-    print("Predicción 1:", my_knn.knn_method1(csv_submited))
-    print("Predicción 2:", my_knn.knn_method2(csv_submited))
+    preprocessed = my_knn.pre_processing(matrix, isDark)
+    print("Predicción 1:", my_knn.knn_method1(preprocessed))
+    print("Predicción 2:", my_knn.knn_method2(preprocessed))
 
 def drawing_in_window():  # toma el dibujo de la matriz y lo representa en la ventana
     for y in range(ancho):
@@ -85,15 +88,17 @@ def ui_draw():
 
 def ui_submit():
     pyxel.text(5, 10, "Type of submsn: ", 7)
-    pyxel.text(5, 20, "1. Image ", 7)
-    pyxel.text(5, 30, "2. CSV ", 7)
-    pyxel.text(5, 40, "To predict use P ", 7)
-    pyxel.text(5, 50, "To go to MENU use M", 7)
-    pyxel.text(5, 60, "* submit b4 running", 7)
+    pyxel.text(5, 20, "I. Image ", 7)
+    pyxel.text(5, 30, "F. CSV ", 7)
+    pyxel.text(5, 40, "To change background base color use C", 7)
+    pyxel.text(5, 50, "To predict use P ", 7)
+    pyxel.text(5, 60, "To go to MENU use M", 7)
+    pyxel.text(5, 70, "* submit b4 running", 7)
     if app2_image_submode:
-        pyxel.text(5, 70, "Mode: PNG", 8)
+        pyxel.text(5, 80, "Mode: PNG", 8)
     if app2_image_csvmode:
-        pyxel.text(5, 70, "Mode: CSV", 8)
+        pyxel.text(5, 80, "Mode: CSV", 8)
+    pyxel.text(5, 90, "Dark: " + str(isDark), 9)
 
 
 class App:
@@ -137,23 +142,25 @@ class App:
                 erase_drawing()  # se borra el dibujo
 
             if pyxel.btnp(pyxel.KEY_P):  # si se presiona la tecla P
-                predict_knn_pix()  # se predice el numero
+                predict_knn(dibujo_matrix, True)  # se predice el numero
 
         if app2_image:
-            global app2_image_submode, app2_image_csvmode
-
-            if pyxel.btnp(pyxel.KEY_1):
+            global app2_image_submode, app2_image_csvmode, isDark
+            if pyxel.btnp(pyxel.KEY_I):
                 app2_image_submode = True
                 app2_image_csvmode = False
-            if pyxel.btnp(pyxel.KEY_2):
+                importFile("IMAGE")
+            if pyxel.btnp(pyxel.KEY_F):
                 app2_image_csvmode = True
                 app2_image_submode = False
+                importFile("CSV")
+            if pyxel.btnp(pyxel.KEY_C):
+                isDark = not isDark
             if pyxel.btnp(pyxel.KEY_P):
                 if app2_image_submode:
-                    predict_knn_img()
+                    predict_knn(image_submited, isDark)
                 if app2_image_csvmode:
-                    predict_knn_csv()
-                    print(csv_submited)
+                    predict_knn(csv_submited, isDark)
 
 
 

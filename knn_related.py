@@ -17,41 +17,41 @@ for i in range(10):
     mean_digits[i] = np.mean(images[target == i], axis=0)
 
 
-def pre_processing(mat):  # función que recibe una imagen y establece que el max valor sea 16 y minimo 0
+def pre_processing(mat, isDark=False):  # función que recibe una imagen y establece que el max valor sea 16 y minimo 0
 
     # contours, hierarchy = cv2.findContours(mat, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
     # x, y, w, h = cv2.boundingRect(contours)
     #
-    mat = cv2.resize(mat, (8, 8))
+    newMat = cv2.resize(mat, (8, 8))
+
+    if(not isDark):
+        i = 0
+        while i < 8:
+            j = 0
+            while j < 8:
+                newMat[i][j] = 255 - newMat[i][j]
+                j = j + 1
+            i = i + 1
 
     i = 0
 
     while i < 8:
         j = 0
         while j < 8:
-            mat[i][j] = 255 - mat[i][j]
+            if(newMat[i][j]>16):
+                newMat[i][j] = newMat[i][j] * 16 // 255
             j = j + 1
         i = i + 1
 
-    i = 0
-
-    while i < 8:
-        j = 0
-        while j < 8:
-            mat[i][j] = mat[i][j] * 16 / 255
-            j = j + 1
-        i = i + 1
-
-    return mat
+    return newMat
 
 
 def distancia_euclideana(mat1, mat2):
-    return np.sqrt(np.sum((mat1 - mat2) ** 2))
+    return np.sqrt(np.sum(np.square(mat1-mat2)))
 
 
-def knn_method1(img_to_predict):  # method using original dataset
+def knn_method1(preprocessed):  # method using original dataset
 
-    preprocessed = pre_processing(img_to_predict)
 
     distancias = []
 
@@ -75,9 +75,7 @@ def knn_method1(img_to_predict):  # method using original dataset
     return closest
 
 
-def knn_method2(img_to_predict):  # method using mean dataset
-
-    preprocessed = pre_processing(img_to_predict)
+def knn_method2(preprocessed):  # method using mean dataset
 
     distancias = []
 
