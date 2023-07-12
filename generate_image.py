@@ -1,4 +1,5 @@
 from knn_related import *
+import matplotlib.pyplot as plt
 # Se importa el mean_digits de knn related
 
 # 2. Mostrar las matrices de los promedios de cada dígito utilizando matplotlib
