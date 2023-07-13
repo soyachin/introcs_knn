@@ -26,8 +26,8 @@ isDark = False
 dibujo_matrix = np.zeros((alto, ancho))
 
 # Se lee la información de los archivos csv e imágenes
-image_submited = cv2.imread("image.jpg", cv2.IMREAD_GRAYSCALE)
-csv_submited = np.loadtxt("csv_img.csv", delimiter=",")
+image_submited = None
+csv_submited = None
 
 
 def importFile(type):  # Se pasa un string que indica el tipo de archivo que se quiere importar
