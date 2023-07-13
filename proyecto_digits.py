@@ -27,15 +27,12 @@ dibujo_matrix = np.zeros((alto, ancho))
 
 # Se lee la información de los archivos csv e imágenes
 image_submited = None
-csv_submited = None
 
 
 def importFile(type):  # Se pasa un string que indica el tipo de archivo que se quiere importar
-    global csv_submited, image_submited
+    global image_submited
     fileTitle = input("Por favor indique el archivo que desea importar: ")
-    if type == "CSV":
-        csv_submited = np.loadtxt(fileTitle, delimiter=",")
-    elif type == "IMG":
+    if type == "IMG":
         image_submited = cv2.imread(fileTitle, cv2.IMREAD_GRAYSCALE)
 
 
@@ -115,16 +112,13 @@ def ui_draw():
 def ui_submit():
     pyxel.text(5, 10, "Type of submsn: ", 7)
     pyxel.text(5, 20, "I. Image ", 7)
-    pyxel.text(5, 30, "F. CSV ", 7)
-    pyxel.text(5, 40, "To change background base color use C", 7)
-    pyxel.text(5, 50, "To predict use P ", 7)
-    pyxel.text(5, 60, "To go to MENU use M", 7)
-    pyxel.text(5, 70, "* submit b4 running", 7)
+    pyxel.text(5, 30, "To change background base color use C", 7)
+    pyxel.text(5, 40, "To predict use P ", 7)
+    pyxel.text(5, 50, "To go to MENU use M", 7)
+    pyxel.text(5, 60, "* submit b4 running", 7)
     if app_submit_PNGMODE:
-        pyxel.text(5, 80, "Mode: PNG", 8)
-    if app_submit_CSVMODE:
-        pyxel.text(5, 80, "Mode: CSV", 8)
-    pyxel.text(5, 90, "Dark: " + str(isDark), 9)
+        pyxel.text(5, 70, "Mode: IMAGE", 8)
+    pyxel.text(5, 80, "Dark: " + str(isDark), 9)
 
 
 class App:
@@ -181,19 +175,12 @@ class App:
             global app_submit_PNGMODE, app_submit_CSVMODE, isDark
             if pyxel.btnp(pyxel.KEY_I):
                 app_submit_PNGMODE = True
-                app_submit_CSVMODE = False
-                importFile("IMAGE")
-            if pyxel.btnp(pyxel.KEY_F):
-                app_submit_CSVMODE = True
-                app_submit_PNGMODE = False
-                importFile("CSV")
+                importFile("IMG")
             if pyxel.btnp(pyxel.KEY_C):
                 isDark = not isDark
             if pyxel.btnp(pyxel.KEY_P):
                 if app_submit_PNGMODE:
                     predict_knn(image_submited, isDark)
-                if app_submit_CSVMODE:
-                    predict_knn(csv_submited, isDark)
 
     # La función draw() es la encargada de dibujar (mostrar) en la ventana
     def draw(self):
